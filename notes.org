@@ -1,0 +1,36 @@
+#+author: Isaac Leonard
+#+title: Notes on AI Implementation
+* Goals
+The goal of this document is to summarize and categorize the requirements for an AI system to work
+* Broad Requirements
+** Sensing environment
+The environment consists of various components.
+Given that we intend for the AI to run in a virtual world most typically biological senses are not needed.
+Instead there will be digital senses such as input from a terminal, current battery levels, contents of files, input from sockets, etc etc.
+Long term memories and other typically key parts of biological brains may also be better implemented as part of the environment.
+Short term memories and some sort of working environment / analog for paper or desktop for humans may also be another component.
+The AI itself will need to possess some level of working memory along with systems to translate sensory input into memories.
+* Emotions
+Biological systems possess emotions, hormones and endorphins to signify immediate issues that need to be addressed and to prioritize actions that need to be taken.
+The AI will need some sort of goal seaking behaviour.
+* Conciousness
+Most biological brains are able to recover from extreme interuptions in function such as sleep, drugs and even partial death.
+This implies that the firing schedule for neurons must not be particularly important as long as it is regular and neurons can generally begin in a deactivated state before slowly waking up.
+* Interaction
+The AI will need a way to interact with the outside world.
+Having it automatically understand natural language from the start is practically impossible so starting with a very simplistic language will be needed.
+We train dogs by giving them treats in response to them doing what we want, and babies learn by recieving positive reactions from caregivers.
+Some sort of way to boost recently fired neurons will likely be needed.
+* Human Interface
+A way to communicate with the AI will be needed along with a way to modify its environment and its internal state.
+An interface would be needed to edit memories, current brain state, save and restore brains and allow for two way communication with the AI.
+* Disabilities
+In the event that we get AI to truely work it is initially going to be extremely disabled.
+As it is human brains are rarely perfect despite millions of years of natural selection so the first random occurrence of an artificial brain is going to have many problems.
+Things like dementia with memory loss or ADHD with a limited ability to focus are almost certainly going to occur initially and will need to be solved.
+Along with this is the question of what counts as true intelligence.
+Is someone with severe dementia, ADHD, cerebral palsy, tourettes and dysgraphia and dyslexia intelligent?
+I would say yes however if an AI were to possess similar conditions how do you prove the AI has a core of intelligence when its outputs are almost all random?
+Modern brain scans can tell if peoples thought processes are working even if they cannot move or perceive however this is impossible to do with an AI without a deep understanding of how it should be operating.
+Some level of repeatable communication surely must be needed to make any real conclusions of intelligence.
+Deep neurosurgery at least should be easier and more reversible with an AI then with humans so making adjustments to improve its communication should be achievable.
