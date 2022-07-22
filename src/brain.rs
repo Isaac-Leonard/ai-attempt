@@ -1,4 +1,6 @@
+use rand::Rng;
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub struct Cell {
     pub last_fired: u32,
@@ -6,7 +8,12 @@ pub struct Cell {
     pub charge: i32,
     pub target: i32,
     pub adds: bool,
-    pub reset_time: u16,
+    pub reset_time: u32,
+}
+impl Display for Cell {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "lastfired: {}, charge: {}", self.last_fired, self.charge)
+    }
 }
 
 #[derive(Debug)]
@@ -15,27 +22,66 @@ pub struct Brain {
     pub connections: HashMap<(usize, usize), i16>,
 }
 impl Brain {
-    pub fn new() -> Self {
+    pub fn new(mut prng: impl Rng) -> Self {
         let mut brain = Brain {
             cells: Vec::new(),
             connections: HashMap::new(),
         };
-        for i in 0..1000000 {
-            let adds = i % 1000 > 500;
+        // Set up time processing
+        for i in 0..128 {
+            let adds = i % 1000 > 50;
+            brain.cells.push(Cell {
+                charge: 0,
+                adds,
+                connections: vec![
+                    prng.gen_range(128..1000000),
+                    prng.gen_range(128..1000000),
+                    prng.gen_range(128..1000000),
+                ],
+                target: 1,
+                last_fired: 0,
+                reset_time: 0,
+            })
+        }
+
+        for i in 128..1000000 {
+            let adds = i % 1000 > 50;
             brain.cells.push(Cell {
                 charge: 0,
                 adds,
                 connections: Vec::new(),
-                target: 10,
+                target: 1,
                 last_fired: 0,
-                reset_time: 4,
+                reset_time: 2,
             })
         }
-        for i in 0..100 {
+        for i in 2..10000 {
+            for j in 0..100 {
+                brain.cells[i * 100 + j]
+                    .connections
+                    .push(prng.gen_range(0..100) + i * 100);
+                brain.cells[i * 100 + j]
+                    .connections
+                    .push(prng.gen_range(0..100) + i * 100);
+                brain.cells[i * 100 + j]
+                    .connections
+                    .push(prng.gen_range(0..100) + i * 100);
+            }
+        }
+        for i in 1..100 {
             for j in 0..10000 {
                 brain.cells[i * 10000 + j].connections.append(&mut vec![
-                    i * 10000 + 10000 - j,
-                    (i * 10000 + 10000 + j * 2) % 1000000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(0..10000) + i * 10000,
+                    prng.gen_range(128..1000000),
+                    prng.gen_range(128..1000000),
+                    (prng.gen_range(0..100000) + i * 10000) % 1000000,
                 ]);
             }
         }
@@ -59,14 +105,15 @@ impl Brain {
         }
         for i in 0..1000 {}
         for i in 0..self.cells.len() {
-            if self.cells[i].charge > self.cells[i].target {
+            self.cells[i].last_fired += 1;
+            if self.cells[i].charge >= self.cells[i].target
+                && self.cells[i].last_fired < self.cells[i].reset_time
+            {
                 for connection in self.cells[i].connections.clone() {
                     self.cells[connection].charge += 1;
                 }
                 self.cells[i].last_fired = 0;
                 self.cells[i].charge = 0;
-            } else {
-                self.cells[i].last_fired += 1;
             }
         }
     }
