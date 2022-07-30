@@ -24,24 +24,18 @@ impl Cell {
 pub struct Synapse {
     pub strength: u8,
     pub adds: bool,
-    from: usize,
-    to: usize,
+    pub to: usize,
 }
 impl Synapse {
-    pub fn new(strength: u8, adds: bool, from: usize, to: usize) -> Self {
-        Self {
-            strength,
-            adds,
-            from,
-            to,
-        }
+    pub fn new(strength: u8, adds: bool, to: usize) -> Self {
+        Self { strength, adds, to }
     }
 
-    pub fn new_basic(from: usize, to: usize) -> Self {
+    pub fn new_basic(to: usize) -> Self {
         Self {
             strength: 1,
             adds: true,
-            from,
+
             to,
         }
     }
@@ -50,7 +44,7 @@ impl Synapse {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Brain {
     pub cells: Vec<Cell>,
-    pub connections: Vec<Synapse>,
+    pub connections: Vec<Vec<Synapse>>,
 }
 impl Brain {
     pub fn new(mut prng: impl Rng) -> Self {
@@ -133,18 +127,23 @@ impl Brain {
             reset_time: 3,
             decay: 6,
         });
-        brain.connections.push(Synapse::new(1, true, 128, 131));
-        brain.connections.push(Synapse::new(1, true, 128, 132));
-        brain.connections.push(Synapse::new_basic(129, 131));
-        brain.connections.push(Synapse::new_basic(130, 132));
-        brain.connections.push(Synapse::new_basic(129, 133));
-        brain.connections.push(Synapse::new_basic(130, 134));
-        brain.connections.push(Synapse::new_basic(133, 131));
-        brain.connections.push(Synapse::new_basic(134, 132));
-        brain.connections.push(Synapse::new_basic(133, 135));
-        brain.connections.push(Synapse::new_basic(134, 136));
-        brain.connections.push(Synapse::new_basic(135, 131));
-        brain.connections.push(Synapse::new_basic(136, 132));
+
+        for _ in 0..brain.cells.len() {
+            brain.connections.push(Vec::new())
+        }
+
+        brain.connections[128].push(Synapse::new_basic(131));
+        brain.connections[128].push(Synapse::new_basic(132));
+        brain.connections[129].push(Synapse::new_basic(131));
+        brain.connections[130].push(Synapse::new_basic(132));
+        brain.connections[129].push(Synapse::new_basic(133));
+        brain.connections[130].push(Synapse::new_basic(134));
+        brain.connections[133].push(Synapse::new_basic(131));
+        brain.connections[134].push(Synapse::new_basic(132));
+        brain.connections[133].push(Synapse::new_basic(135));
+        brain.connections[134].push(Synapse::new_basic(136));
+        brain.connections[135].push(Synapse::new_basic(131));
+        brain.connections[136].push(Synapse::new_basic(132));
 
         brain
     }
@@ -175,7 +174,7 @@ impl Brain {
             if self.cells[i].charge >= self.cells[i].target
                 && self.cells[i].last_fired as u8 > self.cells[i].reset_time
             {
-                for connection in self.connections.iter().filter(|x| x.from == i) {
+                for connection in &self.connections[i] {
                     self.cells[connection.to].charge += 1;
                 }
                 self.cells[i].last_fired = 0;
