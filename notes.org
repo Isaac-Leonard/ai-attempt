@@ -34,3 +34,8 @@ I would say yes however if an AI were to possess similar conditions how do you p
 Modern brain scans can tell if peoples thought processes are working even if they cannot move or perceive however this is impossible to do with an AI without a deep understanding of how it should be operating.
 Some level of repeatable communication surely must be needed to make any real conclusions of intelligence.
 Deep neurosurgery at least should be easier and more reversible with an AI then with humans so making adjustments to improve its communication should be achievable.
+* Structure and Neurons
+Experiments in ferrets seemms to demonstrate that neurons are highly flexible and can adapt to work with any inputs.
+Only intrinsic connections seem to control what different areas of the brain do and these connections seem to be rewirable.
+This means that as long as neurons are built correctly they should form some form of working structure.
+The best plan I can think of is to give a wide variety of possible neuron structures and then select for better performing brains via manually selecting from random permutations.
