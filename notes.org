@@ -39,3 +39,17 @@ Experiments in ferrets seemms to demonstrate that neurons are highly flexible an
 Only intrinsic connections seem to control what different areas of the brain do and these connections seem to be rewirable.
 This means that as long as neurons are built correctly they should form some form of working structure.
 The best plan I can think of is to give a wide variety of possible neuron structures and then select for better performing brains via manually selecting from random permutations.
+** Neuron types
+- Max
+- Min
+- Plus
+- additive Inverse
+- times
+- multiplicative inverse
+- sin
+- asin
+- Constant
+- tan
+- atan
+- E to the power of
+- ln
