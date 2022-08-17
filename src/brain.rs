@@ -1,8 +1,7 @@
 use rand::Rng;
-use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct Cell {
     pub last_fired: u32,
     pub charge: i8,
@@ -16,11 +15,20 @@ impl Display for Cell {
     }
 }
 impl Cell {
+    pub fn new(target: i8, reset_time: u8, decay: u8) -> Self {
+        Self {
+            target,
+            reset_time,
+            decay,
+            last_fired: 0,
+            charge: 0,
+        }
+    }
     pub fn to_bytes(&self) -> [u8; 3] {
-        [self.target as u8, self.reset_time as u8, self.decay as u8]
+        [self.target as u8, self.reset_time, self.decay]
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct Synapse {
     pub strength: u8,
     pub adds: bool,
@@ -35,13 +43,28 @@ impl Synapse {
         Self {
             strength: 1,
             adds: true,
-
             to,
         }
     }
+
+    pub fn to_bytes(&self) -> [u8; 10] {
+        let to = self.to.to_be_bytes();
+        [
+            self.strength,
+            self.adds as u8,
+            to[0],
+            to[1],
+            to[2],
+            to[3],
+            to[4],
+            to[5],
+            to[6],
+            to[7],
+        ]
+    }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct Brain {
     pub cells: Vec<Cell>,
     pub connections: Vec<Vec<Synapse>>,
@@ -153,11 +176,11 @@ impl Brain {
             self.cells[128].charge += 1;
         }
 
-        if inputs.food < 0 {
+        if inputs.food_coord < 0 {
             self.cells[129].charge += 1;
         }
 
-        if inputs.food > 0 {
+        if inputs.food_coord > 0 {
             self.cells[130].charge += 1;
         }
 
@@ -182,6 +205,7 @@ impl Brain {
             }
         }
     }
+
     fn fire_time(&mut self) {
         let time = get_time();
         for (i, byte) in time.iter().enumerate() {
@@ -194,12 +218,63 @@ impl Brain {
             }
         }
     }
+
+    pub fn random_mutate(&mut self, mut rng: impl Rng) {
+        let type_mutation = rng.gen_range(0..2);
+        if type_mutation == 0 {
+            let cell = Cell::new(
+                rng.gen_range(-10..10),
+                rng.gen_range(0..10),
+                rng.gen_range(0..10),
+            );
+            self.cells.push(cell);
+            self.connections.push(vec![Synapse::new_basic(
+                rng.gen_range(0..self.cells.len() - 1),
+            )]);
+        } else {
+            self.connections[rng.gen_range(0..self.cells.len())]
+                .push(Synapse::new_basic(rng.gen_range(0..self.cells.len())));
+        }
+    }
+    pub fn serialise(&self) -> Vec<u8> {
+        let mut output = Vec::new();
+        output.append(&mut self.cells.len().to_be_bytes().to_vec());
+        for cell in &self.cells {
+            output.append(&mut cell.to_bytes().to_vec())
+        }
+        for connection in &self.connections {
+            output.append(&mut connection.len().to_be_bytes().to_vec());
+            for connection in connection {
+                output.append(&mut connection.to_bytes().to_vec())
+            }
+        }
+        output
+    }
+
+    pub fn deserialise(data: &[u8]) -> Self {
+        let mut brain = Brain {
+            cells: Vec::new(),
+            connections: Vec::new(),
+        };
+        let cell_count_bytes = &data[0..8];
+        let mut count = 0;
+        for i in 0..8 {
+            count += (cell_count_bytes[i] as usize) << (i * 8);
+        }
+        let last_cell = count + 8;
+        for i in (8..last_cell).step_by(3) {
+            brain
+                .cells
+                .push(Cell::new(data[i] as i8, data[i + 1], data[i + 2]))
+        }
+        brain
+    }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct Inputs {
     pub hunger: u8,
-    pub food: i8,
+    pub food_coord: i8,
 }
 
 fn u8_to_bools(mut num: u8) -> [bool; 8] {
